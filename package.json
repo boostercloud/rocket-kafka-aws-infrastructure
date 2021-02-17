@@ -1,0 +1,72 @@
+{
+  "name": "@boostercloud/booster-kafka-aws-infraestructure",
+  "version": "0.0.1",
+  "description": "Booster rocket to integrate a self managed Kafka cluster with your Booster Application",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "lint:check": "eslint --ext '.js,.ts' **/*.ts",
+    "lint:fix": "eslint --quiet --fix --ext '.js,.ts' **/*.ts",
+    "compile": "tsc -b tsconfig.json",
+    "clean": "rimraf ./dist tsconfig.tsbuildinfo",
+    "prepack": "tsc -b tsconfig.json",
+    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charlietfe/booster-kafka-rocket.git"
+  },
+  "keywords": [
+    "booster",
+    "kafka",
+    "cloud",
+    "ddd",
+    "event-driven"
+  ],
+  "author": "Booster Cloud",
+  "homepage": "https://booster.cloud",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-dynamodb": "1.67.0",
+    "@aws-cdk/aws-ec2": "1.67.0",
+    "@aws-cdk/aws-events": "1.67.0",
+    "@aws-cdk/aws-iam": "1.67.0",
+    "@aws-cdk/aws-lambda": "1.67.0",
+    "@aws-cdk/aws-lambda-event-sources": "1.67.0",
+    "@aws-cdk/aws-secretsmanager": "1.67.0",
+    "@aws-cdk/core": "1.67.0"
+  },
+  "devDependencies": {
+    "@boostercloud/framework-core": "0.11.3",
+    "@boostercloud/framework-provider-aws-infrastructure": "0.11.3",
+    "@boostercloud/framework-types": "0.11.3",
+    "@types/chai": "^4.2.14",
+    "@types/chai-as-promised": "^7.1.2",
+    "@types/mocha": "^8.2.0",
+    "@types/node": "14.14.20",
+    "@types/sinon": "^7.5.1",
+    "@types/sinon-chai": "^3.2.3",
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "aws-sdk": "2.764.0",
+    "chai": "4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "faker": "5.1.0",
+    "mocha": "^8.2.1",
+    "nyc": "^15.0.1",
+    "prettier": "^1.19.1",
+    "sinon": "9.2.3",
+    "sinon-chai": "^3.5.0",
+    "ts-node": "^8.6.2",
+    "typescript": "3.9.4"
+  }
+}
