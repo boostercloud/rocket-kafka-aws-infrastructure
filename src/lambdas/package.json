@@ -1,0 +1,14 @@
+{
+  "name": "lambdas",
+  "version": "0.0.6",
+  "description": "",
+  "main": "index.ts",
+  "author": "",
+  "license": "ISC",
+  "bundledDependencies": [
+    "@boostercloud/framework-core"
+  ],
+  "dependencies": {
+    "@boostercloud/framework-core": "0.11.3"
+  }
+}

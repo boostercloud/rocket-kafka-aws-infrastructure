@@ -5,10 +5,10 @@ import { KafkaMessageReceived } from '../events/kafka-message-received'
 
 @Entity
 export class KafkaMessage {
-  public constructor(readonly id: UUID, readonly payload: any) {}
+  public constructor(readonly id: UUID, readonly topic: string, readonly payload: any) {}
 
   @Reduces(KafkaMessageReceived)
-  public static reduceSmallFileAdded(event: KafkaMessageReceived, currentSmallFile?: KafkaMessage): KafkaMessage {
-    return new KafkaMessage(UUID.generate(), event.payload)
+  public static onMessageReceived(event: KafkaMessageReceived): KafkaMessage {
+    return new KafkaMessage(event.messageId, event.topic, event.payload)
   }
 }

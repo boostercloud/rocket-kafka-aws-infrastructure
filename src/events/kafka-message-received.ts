@@ -4,9 +4,9 @@ import { UUID } from '@boostercloud/framework-types'
 
 @Event
 export class KafkaMessageReceived {
-  public constructor(readonly id: UUID, readonly payload: any) {}
+  public constructor(readonly messageId: string, readonly topic: string, readonly payload: any) {}
 
   public entityID(): UUID {
-    return this.id
+    return this.messageId
   }
 }

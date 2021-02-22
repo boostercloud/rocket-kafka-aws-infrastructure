@@ -1,17 +1,19 @@
-import { Duration, Stack } from '@aws-cdk/core'
+import { CfnInclude, Duration, Stack } from '@aws-cdk/core'
 import { BoosterConfig } from '@boostercloud/framework-types'
+import { PolicyStatement } from '@aws-cdk/aws-iam'
 import { Code, Function, Runtime } from '@aws-cdk/aws-lambda'
 import { Table } from '@aws-cdk/aws-dynamodb'
-
 import path = require('path')
-import { SelfManagedKafkaEventSource } from './cdk-extensions/kafka'
-import { StartingPosition } from './cdk-extensions/event-source-mapping'
-import { Secret } from '@aws-cdk/aws-secretsmanager'
+
+export interface TopicConfig {
+  topicName: string
+}
 
 export interface KafkaRocketParams {
-  topic: string
+  topicConfig: TopicConfig[]
   bootstrapServers: string[]
-  secretName: string
+  // TODO: How to generate secrets
+  secretArn: string
 }
 
 export class KafkaRocketStack {
@@ -32,16 +34,58 @@ export class KafkaRocketStack {
       },
     })
 
-    const secret = new Secret(stack, 'Secret', { secretName: params.secretName })
-    kafkaTriggerFunction.addEventSource(
-      new SelfManagedKafkaEventSource({
-        bootstrapServers: params.bootstrapServers,
-        topic: params.topic,
-        secret: secret,
-        batchSize: 100,
-        startingPosition: StartingPosition.LATEST,
+    const eventsStoreAccessPolicy = new PolicyStatement({
+      resources: [eventsStore.tableArn],
+      actions: ['dynamodb:Put*'],
+    })
+    kafkaTriggerFunction.addToRolePolicy(eventsStoreAccessPolicy)
+
+    const secretAccessPolicy = new PolicyStatement({
+      resources: [params.secretArn],
+      actions: ['secretsmanager:GetSecretValue'],
+    })
+    kafkaTriggerFunction.addToRolePolicy(secretAccessPolicy)
+
+    KafkaRocketStack.addKafkaEventSourceForTopic(stack, params, kafkaTriggerFunction)
+  }
+
+  private static addKafkaEventSourceForTopic = (
+    stack: Stack,
+    params: KafkaRocketParams,
+    kafkaTriggerFunction: Function
+  ): void => {
+    const baseProperties = {
+      FunctionName: kafkaTriggerFunction.functionArn,
+      StartingPosition: 'LATEST',
+      SelfManagedEventSource: {
+        Endpoints: {
+          KafkaBootstrapServers: params.bootstrapServers,
+        },
+      },
+      SourceAccessConfigurations: [
+        {
+          Type: 'SASL_SCRAM_512_AUTH',
+          URI: params.secretArn,
+        },
+      ],
+    }
+
+    params.topicConfig.forEach((config) => {
+      const resourceName = 'kfkes' + config.topicName.replace('-', '')
+      new CfnInclude(stack, resourceName, {
+        template: {
+          Resources: {
+            [resourceName]: {
+              Type: 'AWS::Lambda::EventSourceMapping',
+              Properties: {
+                ...baseProperties,
+                Topics: [config.topicName],
+              },
+            },
+          },
+        },
       })
-    )
+    })
   }
 
   public static unmountStack?(): void {

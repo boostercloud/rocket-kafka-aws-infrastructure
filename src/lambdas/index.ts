@@ -1,49 +1,42 @@
+/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { UUID } from '@boostercloud/framework-types'
+import { DynamoDB } from 'aws-sdk'
+
 export const handler = async (event: any): Promise<void> => {
   for (const key in event.records) {
-    console.log('Key: ', key)
-    // Iterate through records
-    event.records[key].map((record: any) => {
-      console.log('Record: ', record)
-      // Decode base64
-      const msg = Buffer.from(record.value, 'base64').toString()
-      console.log('Message:', msg)
-    })
+    const kafkaRecords = event.records[key]
+    for (let i = 0; i < kafkaRecords.length; i++) {
+      const record = kafkaRecords[i]
+      const payload = Buffer.from(record.value, 'base64').toString()
+      await saveEvent({
+        messageId: UUID.generate(),
+        topic: record.topic,
+        payload,
+      })
+    }
   }
 }
 
-/*
-async function saveEvent(key: string): Promise<void> {
-  const { v4: uuidv4 } = require('uuid')
+async function saveEvent(value: any): Promise<void> {
   const ddb = new DynamoDB.DocumentClient()
-  const s3 = new S3()
-
-  const fileURI = `s3://${stagingBucketName}/${key}`
-  const fileSize = (await s3.headObject({ Key: key, Bucket: stagingBucketName }).promise()).ContentLength
-
-  const boosterEvent = {
-    fileURI: fileURI,
-    filesize: fileSize,
-  }
-
   const params = {
     TableName: process.env.EVENT_STORE_NAME!,
     Item: {
       createdAt: new Date().toISOString(),
-      entityID: fileURI,
+      entityID: value.messageId,
       entityTypeName: process.env.ENTITY_TYPE_NAME,
-      entityTypeName_entityID_kind: `${process.env.ENTITY_TYPE_NAME}-${fileURI}-event`,
+      entityTypeName_entityID_kind: `${process.env.ENTITY_TYPE_NAME}-${value.messageId}-event`,
       kind: 'event',
-      requestID: uuidv4(),
+      requestID: UUID.generate(),
       typeName: process.env.TYPE_NAME,
-      value: boosterEvent,
+      value,
       version: 1,
     },
   }
-
   try {
     await ddb.put(params).promise()
   } catch (e) {
-    console.log('[ROCKET#batch-file] An error occurred while performing a PutItem operation: ', e)
+    console.log('[ROCKET#booster-kafka] An error occurred while performing a PutItem operation: ', e)
   }
-}*/
+}
