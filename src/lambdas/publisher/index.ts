@@ -17,7 +17,7 @@ export const handler = async (event: any): Promise<void> => {
     brokers: nodes,
     ssl: true,
     sasl: {
-      mechanism: 'scram-sha-256',
+      mechanism: 'scram-sha-512',
       username: secretValue.username,
       password: secretValue.password,
     },
