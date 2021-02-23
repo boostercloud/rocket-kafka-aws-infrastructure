@@ -1,6 +1,6 @@
 {
   "name": "@boostercloud/rocket-kakfa-connector-aws-infrastructure",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Booster rocket to integrate a self managed Kafka cluster with your Booster Application",
   "main": "dist/index.js",
   "files": [

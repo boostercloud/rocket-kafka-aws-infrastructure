@@ -14,6 +14,7 @@ export const handler = async (event: any): Promise<void> => {
         messageId: UUID.generate(),
         topic: record.topic,
         payload,
+        createdAt: new Date().toISOString(),
       })
     }
   }
