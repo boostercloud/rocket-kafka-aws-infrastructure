@@ -8,7 +8,8 @@ export const handler = async (event: any): Promise<void> => {
     const kafkaRecords = event.records[key]
     for (let i = 0; i < kafkaRecords.length; i++) {
       const record = kafkaRecords[i]
-      const payload = Buffer.from(record.value, 'base64').toString()
+      const data = Buffer.from(record.value, 'base64').toString()
+      const payload = JSON.parse(data)
       await saveEvent({
         messageId: UUID.generate(),
         topic: record.topic,
