@@ -5,7 +5,7 @@ import { DynamoEventSource } from '@aws-cdk/aws-lambda-event-sources'
 import { Duration, Stack } from '@aws-cdk/core'
 import { BoosterConfig } from '@boostercloud/framework-types'
 import path = require('path')
-import { KafkaRocketParams } from './stack'
+import { KafkaRocketParams } from './types'
 
 export class KafkaProducerCDK {
   static createProducerLambda(stack: Stack, config: BoosterConfig, params: KafkaRocketParams): void {
