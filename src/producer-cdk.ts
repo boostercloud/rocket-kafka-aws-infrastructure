@@ -1,5 +1,5 @@
 import { Table } from '@aws-cdk/aws-dynamodb'
-import { ServicePrincipal } from '@aws-cdk/aws-iam'
+import { PolicyStatement, ServicePrincipal } from '@aws-cdk/aws-iam'
 import { Code, Runtime, Function, StartingPosition } from '@aws-cdk/aws-lambda'
 import { DynamoEventSource } from '@aws-cdk/aws-lambda-event-sources'
 import { Duration, Stack } from '@aws-cdk/core'
@@ -23,10 +23,17 @@ export class KafkaProducerCDK {
         KAFKA_NODES: params.bootstrapServers.toString(),
         KAFKA_PUBLISH_TOPIC: params.publishTopic,
         KAFKA_SUBSCRIBED_TOPIC: params.subscribedTopic,
+        KAFKA_SECRET_ARN: params.secretArn,
       },
     })
     publisherLambda.addPermission(`${config.appName}-kafka-rocket-publisher-permission`, {
       principal: new ServicePrincipal('dynamodb.amazonaws.com'),
     })
+
+    const secretAccessPolicy = new PolicyStatement({
+      resources: [params.secretArn],
+      actions: ['secretsmanager:GetSecretValue'],
+    })
+    publisherLambda.addToRolePolicy(secretAccessPolicy)
   }
 }
