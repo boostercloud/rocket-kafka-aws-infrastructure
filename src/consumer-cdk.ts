@@ -7,7 +7,7 @@ import path = require('path')
 import { KafkaRocketParams } from './types'
 
 export class KafkaConsumerCDK {
-  static createKafkaConsumer(stack: Stack, config: BoosterConfig, params: KafkaRocketParams) {
+  static createKafkaConsumer(stack: Stack, config: BoosterConfig, params: KafkaRocketParams): void {
     const eventsStore = stack.node.tryFindChild('events-store') as Table
 
     const kafkaTriggerFunction = new Function(stack, 'rocketKafkaTrigger', {
