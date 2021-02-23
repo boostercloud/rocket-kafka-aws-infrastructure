@@ -87,8 +87,4 @@ export class KafkaRocketStack {
       })
     })
   }
-
-  public static unmountStack?(): void {
-    console.log('Unmount')
-  }
 }
