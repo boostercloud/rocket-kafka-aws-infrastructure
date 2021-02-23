@@ -1,0 +1,11 @@
+{
+  "name": "lambda-publisher",
+  "version": "0.0.6",
+  "description": "",
+  "main": "index.ts",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "kafkajs": "^1.15.0"
+  }
+}

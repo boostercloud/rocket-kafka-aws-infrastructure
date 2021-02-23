@@ -1,9 +1,11 @@
-import { CfnInclude, Duration, Stack } from '@aws-cdk/core'
+//import { CfnInclude, Duration, Stack } from '@aws-cdk/core'
+import { Stack } from '@aws-cdk/core'
 import { BoosterConfig } from '@boostercloud/framework-types'
-import { PolicyStatement } from '@aws-cdk/aws-iam'
-import { Code, Function, Runtime } from '@aws-cdk/aws-lambda'
-import { Table } from '@aws-cdk/aws-dynamodb'
-import path = require('path')
+//import { PolicyStatement } from '@aws-cdk/aws-iam'
+//import { Code, Function, Runtime } from '@aws-cdk/aws-lambda'
+//import { Table } from '@aws-cdk/aws-dynamodb'
+//import path = require('path')
+import { KafkaProducerCDK } from './producer-cdk'
 
 export interface TopicConfig {
   topicName: string
@@ -12,13 +14,16 @@ export interface TopicConfig {
 export interface KafkaRocketParams {
   topicConfig: TopicConfig[]
   bootstrapServers: string[]
+  publishTopic: string
+  subscribedTopic: string
   // TODO: How to generate secrets
   secretArn: string
 }
 
 export class KafkaRocketStack {
   public static mountStack(params: KafkaRocketParams, stack: Stack, config: BoosterConfig): void {
-    const eventsStore = stack.node.tryFindChild('events-store') as Table
+    KafkaProducerCDK.createProducerLambda(stack, config, params)
+    /*const eventsStore = stack.node.tryFindChild('events-store') as Table
 
     const kafkaTriggerFunction = new Function(stack, 'rocketKafkaTrigger', {
       runtime: Runtime.NODEJS_12_X,
@@ -85,6 +90,6 @@ export class KafkaRocketStack {
           },
         },
       })
-    })
+    })*/
   }
 }
