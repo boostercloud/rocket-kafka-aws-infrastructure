@@ -29,7 +29,7 @@ export const handler = async (event: any): Promise<void> => {
     const producer = kafka.producer()
     await producer.connect()
     await producer.send({
-      topic: `m7ok2npy-${topic}`,
+      topic: topic,
       messages: [{ value: JSON.stringify(unmarshall.value) }],
     })
     await producer.disconnect()
