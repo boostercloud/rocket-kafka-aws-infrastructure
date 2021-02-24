@@ -7,17 +7,17 @@ import { BoosterConfig } from '@boostercloud/framework-types'
 import path = require('path')
 import { KafkaRocketParams } from './types'
 
-export class KafkaProducerCDK {
-  static createProducerLambda(stack: Stack, config: BoosterConfig, params: KafkaRocketParams): void {
+export class KafkaProducerStack {
+  static mountStack(stack: Stack, config: BoosterConfig, params: KafkaRocketParams): void {
     const eventStore = stack.node.tryFindChild('events-store') as Table
 
-    const publisherLambda = new Function(stack, 'rocketKafkaPublisher', {
+    const publisherLambda = new Function(stack, 'kafkaProducer', {
       runtime: Runtime.NODEJS_12_X,
       timeout: Duration.minutes(15),
       memorySize: 1024,
-      handler: 'index.handler',
-      functionName: config.appName + '',
-      code: Code.fromAsset(path.join(__dirname, 'lambdas/publisher')),
+      handler: 'index.publisherHandler',
+      functionName: config.appName + '-kafka-producer',
+      code: Code.fromAsset(path.join(__dirname, 'lambdas')),
       events: [new DynamoEventSource(eventStore, { startingPosition: StartingPosition.LATEST, batchSize: 1 })],
       environment: {
         KAFKA_NODES: params.bootstrapServers.toString(),

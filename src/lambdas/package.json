@@ -6,9 +6,11 @@
   "author": "",
   "license": "ISC",
   "bundledDependencies": [
-    "@boostercloud/framework-core"
+    "@boostercloud/framework-core",
+    "kafkajs"
   ],
   "dependencies": {
-    "@boostercloud/framework-core": "0.11.3"
+    "@boostercloud/framework-core": "0.11.3",
+    "kafkajs": "^1.15.0"
   }
 }

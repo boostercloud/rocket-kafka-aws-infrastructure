@@ -1,11 +1,11 @@
 import { Stack } from '@aws-cdk/core'
 import { BoosterConfig } from '@boostercloud/framework-types'
-import { KafkaProducerCDK } from './producer-cdk'
+import { KafkaProducerStack } from './producer-stack'
 import { KafkaRocketParams } from './types'
-import { KafkaConsumerCDK } from './consumer-cdk'
+import { KafkaConsumerStack } from './consumer-stack'
 export class KafkaRocketStack {
   public static mountStack(params: KafkaRocketParams, stack: Stack, config: BoosterConfig): void {
-    KafkaProducerCDK.createProducerLambda(stack, config, params)
-    KafkaConsumerCDK.createKafkaConsumer(stack, config, params)
+    KafkaProducerStack.mountStack(stack, config, params)
+    KafkaConsumerStack.mountStack(stack, config, params)
   }
 }

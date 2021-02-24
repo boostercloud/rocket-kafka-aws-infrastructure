@@ -6,16 +6,16 @@ import { Table } from '@aws-cdk/aws-dynamodb'
 import path = require('path')
 import { KafkaRocketParams } from './types'
 
-export class KafkaConsumerCDK {
-  static createKafkaConsumer(stack: Stack, config: BoosterConfig, params: KafkaRocketParams): void {
+export class KafkaConsumerStack {
+  static mountStack(stack: Stack, config: BoosterConfig, params: KafkaRocketParams): void {
     const eventsStore = stack.node.tryFindChild('events-store') as Table
 
-    const kafkaTriggerFunction = new Function(stack, 'rocketKafkaTrigger', {
+    const kafkaTriggerFunction = new Function(stack, 'kafkaConsumer', {
       runtime: Runtime.NODEJS_12_X,
       timeout: Duration.minutes(15),
       memorySize: 1024,
-      handler: 'index.handler',
-      functionName: config.appName + '-kafka-rocket-trigger',
+      handler: 'index.consumerHandler',
+      functionName: config.appName + '-kafka-consumer',
       code: Code.fromAsset(path.join(__dirname, 'lambdas')),
       environment: {
         EVENT_STORE_NAME: eventsStore.tableName,
