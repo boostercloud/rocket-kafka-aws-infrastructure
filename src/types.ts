@@ -1,12 +1,21 @@
-export interface TopicConfig {
+export interface ConsumerTopicConfig {
   topicName: string
+  mappingOptions?: {
+    entityTypeName: string
+    eventTypeName: string
+    fields: Record<string, string>[]
+  }
+}
+
+export interface ProducerTopicConfig {
+  topicName: string
+  eventTypeName: string
+  fields?: Record<string, string>[]
 }
 
 export interface KafkaRocketParams {
-  topicConfig: TopicConfig[]
+  consumerConfig: ConsumerTopicConfig[]
+  producerConfig: ProducerTopicConfig[]
   bootstrapServers: string[]
-  publishTopic: string
-  subscribedTopic: string
-  // TODO: How to generate secrets
   secretArn: string
 }

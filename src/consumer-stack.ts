@@ -19,8 +19,7 @@ export class KafkaConsumerStack {
       code: Code.fromAsset(path.join(__dirname, 'lambdas')),
       environment: {
         EVENT_STORE_NAME: eventsStore.tableName,
-        ENTITY_TYPE_NAME: 'KafkaMessage',
-        TYPE_NAME: 'KafkaMessageReceived',
+        CONSUMER_CONFIG: JSON.stringify(params.consumerConfig),
       },
     })
 
@@ -38,7 +37,11 @@ export class KafkaConsumerStack {
 
     this.addKafkaEventSourceForTopic(stack, params, kafkaTriggerFunction)
   }
-  private static addKafkaEventSourceForTopic(stack: Stack, params: KafkaRocketParams, kafkaTriggerFunction: Function): void {
+  private static addKafkaEventSourceForTopic(
+    stack: Stack,
+    params: KafkaRocketParams,
+    kafkaTriggerFunction: Function
+  ): void {
     const baseProperties = {
       FunctionName: kafkaTriggerFunction.functionArn,
       StartingPosition: 'LATEST',
@@ -55,7 +58,7 @@ export class KafkaConsumerStack {
       ],
     }
 
-    params.topicConfig.forEach((config) => {
+    params.consumerConfig.forEach((config) => {
       const resourceName = 'kfkes' + config.topicName.replace('-', '')
       new CfnInclude(stack, resourceName, {
         template: {
