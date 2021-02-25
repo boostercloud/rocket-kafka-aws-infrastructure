@@ -3,7 +3,9 @@ export interface ConsumerTopicConfig {
   mappingOptions?: {
     entityTypeName: string
     eventTypeName: string
-    fields: Record<string, string>[]
+    fields: {
+      [key: string]: string
+    }
     topicEntityId: string
   }
 }

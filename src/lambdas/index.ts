@@ -98,10 +98,10 @@ export const publisherHandler = async (event: any): Promise<void> => {
   }
 }
 
-const getValueMappings = (fields: Record<string, string>[], payload: any): any => {
-  let value: any
-  fields.forEach((item) => {
-    value[item.value] = payload[item.key]
+const getValueMappings = (fields: { [key: string]: string }, payload: any): any => {
+  const value = {} as any
+  Object.keys(fields).forEach((key) => {
+    value[fields[key]] = payload[key]
   })
   return value
 }
