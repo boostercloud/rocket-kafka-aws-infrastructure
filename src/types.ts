@@ -4,6 +4,7 @@ export interface ConsumerTopicConfig {
     entityTypeName: string
     eventTypeName: string
     fields: Record<string, string>[]
+    topicEntityId: string
   }
 }
 
