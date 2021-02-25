@@ -3,36 +3,54 @@
 import { UUID } from '@boostercloud/framework-types'
 import { DynamoDB, SecretsManager } from 'aws-sdk'
 import * as KFK from 'kafkajs'
+import { ConsumerTopicConfig } from '../types'
 
 export const consumerHandler = async (event: any): Promise<void> => {
   for (const key in event.records) {
     const kafkaRecords = event.records[key]
     for (let i = 0; i < kafkaRecords.length; i++) {
       const record = kafkaRecords[i]
+      // TODO: TAKE A LOOK AT AVRO, SCHEMA REGISTRY AND SO ON...
       const data = Buffer.from(record.value, 'base64').toString()
       const payload = JSON.parse(data)
-      await saveEvent({
-        messageId: UUID.generate(),
-        topic: record.topic,
-        payload,
-        createdAt: new Date().toISOString(),
-      })
+      await saveEvent(record.topic, payload)
     }
   }
 }
 
-async function saveEvent(value: any): Promise<void> {
+async function saveEvent(topic: string, payload: any): Promise<void> {
   const ddb = new DynamoDB.DocumentClient()
+  const consumerConfig: ConsumerTopicConfig[] = JSON.parse(process.env.CONSUMER_CONFIG!)
+  const topicConfig = consumerConfig.find((item) => item.topicName === topic)
+  if (!topicConfig) {
+    return
+  }
+
+  const messageId = UUID.generate()
+  const createdAt = new Date().toISOString()
+  const entityID = topicConfig.mappingOptions ? payload[topicConfig.mappingOptions.topicEntityId] : messageId
+  const typeName = topicConfig.mappingOptions ? topicConfig.mappingOptions.eventTypeName : 'KafkaMessageReceived'
+  const entityTypeName = topicConfig.mappingOptions ? topicConfig.mappingOptions.entityTypeName : 'KafkaMessage'
+  const valueForKafkaEvent = {
+    messageId,
+    payload,
+    createdAt,
+    topic,
+  }
+  const value = topicConfig.mappingOptions
+    ? getValueMappings(topicConfig.mappingOptions.fields, payload)
+    : valueForKafkaEvent
+
   const params = {
     TableName: process.env.EVENT_STORE_NAME!,
     Item: {
-      createdAt: new Date().toISOString(),
-      entityID: value.messageId,
-      entityTypeName: process.env.ENTITY_TYPE_NAME,
-      entityTypeName_entityID_kind: `${process.env.ENTITY_TYPE_NAME}-${value.messageId}-event`,
+      createdAt,
       kind: 'event',
       requestID: UUID.generate(),
-      typeName: process.env.TYPE_NAME,
+      entityID,
+      entityTypeName,
+      entityTypeName_entityID_kind: `${entityTypeName}-${entityID}-event`,
+      typeName,
       value,
       version: 1,
     },
@@ -78,4 +96,12 @@ export const publisherHandler = async (event: any): Promise<void> => {
   } else {
     console.log(`ignoring the event ${unmarshall.typeName} because it is not of type: ${subscribedTopic}`)
   }
+}
+
+const getValueMappings = (fields: { [key: string]: string }, payload: any): any => {
+  const value = {} as any
+  Object.keys(fields).forEach((key) => {
+    value[fields[key]] = payload[key]
+  })
+  return value
 }
