@@ -13,7 +13,7 @@ export interface ConsumerTopicConfig {
 export interface ProducerTopicConfig {
   topicName: string
   eventTypeName: string
-  fields?: Record<string, string>[]
+  fields?: { [key: string]: string }
 }
 
 export interface KafkaRocketParams {
