@@ -21,8 +21,7 @@ export class KafkaProducerStack {
       events: [new DynamoEventSource(eventStore, { startingPosition: StartingPosition.LATEST, batchSize: 1 })],
       environment: {
         KAFKA_NODES: params.bootstrapServers.toString(),
-        KAFKA_PUBLISH_TOPIC: params.publishTopic,
-        KAFKA_SUBSCRIBED_TOPIC: params.subscribedTopic,
+        KAFKA_TOPICS_CONFIG: JSON.stringify(params.producerConfig),
         KAFKA_SECRET_ARN: params.secretArn,
       },
     })

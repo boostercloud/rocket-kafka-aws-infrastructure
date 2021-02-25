@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UUID } from '@boostercloud/framework-types'
 import { DynamoDB, SecretsManager } from 'aws-sdk'
-import * as KFK from 'kafkajs'
+const { Kafka } = require('kafkajs')
 
 export const consumerHandler = async (event: any): Promise<void> => {
   for (const key in event.records) {
@@ -44,17 +44,28 @@ async function saveEvent(value: any): Promise<void> {
   }
 }
 
+function getKafkaPayload(fields: { [key: string]: string }, boosterEvent: any): string {
+  if (!fields) {
+    return JSON.stringify(boosterEvent.value)
+  } else {
+    const outputData = {} as any
+    Object.keys(fields).forEach((key) => {
+      outputData[fields[key]] = boosterEvent.value[key]
+    })
+    return JSON.stringify(outputData)
+  }
+}
+
 export const publisherHandler = async (event: any): Promise<void> => {
   const nodes = process.env['KAFKA_NODES']?.split(',') || []
-  const topic = process.env['KAFKA_PUBLISH_TOPIC'] || ''
-  const subscribedTopic = process.env['KAFKA_SUBSCRIBED_TOPIC'] || ''
+  const topicConfig = JSON.parse(process.env['KAFKA_TOPICS_CONFIG'] || '')
   const secretArn = process.env['KAFKA_SECRET_ARN'] || ''
 
   const client = new SecretsManager({ region: process.env.AWS_REGION })
   const secret = await client.getSecretValue({ SecretId: secretArn }).promise()
   const secretValue = JSON.parse(secret.SecretString || '{}')
 
-  const kafka = new KFK.Kafka({
+  const kafka = new Kafka({
     clientId: 'booster-kafka-rocket',
     brokers: nodes,
     ssl: true,
@@ -64,18 +75,27 @@ export const publisherHandler = async (event: any): Promise<void> => {
       password: secretValue.password,
     },
   })
+
   const record = event.Records[0]
-  const unmarshall = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
-  console.log(unmarshall.value)
-  if (unmarshall.typeName === subscribedTopic) {
+  const boosterEvent = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
+  const currentTopicConfig = topicConfig.find((element: any) => element.eventTypeName === boosterEvent.typeName)
+
+  console.log(boosterEvent.value)
+  console.log(currentTopicConfig)
+
+  if (currentTopicConfig.length != 0) {
     const producer = kafka.producer()
     await producer.connect()
     await producer.send({
-      topic: topic,
-      messages: [{ value: JSON.stringify(unmarshall.value) }],
+      topic: currentTopicConfig.topicName,
+      messages: [{ value: getKafkaPayload(currentTopicConfig.fields, boosterEvent) }],
     })
     await producer.disconnect()
   } else {
-    console.log(`ignoring the event ${unmarshall.typeName} because it is not of type: ${subscribedTopic}`)
+    console.log(
+      `ignoring the event ${boosterEvent.typeName} because it is not of any of these types: ${topicConfig
+        .map((element: any) => element.topic)
+        .toString()}`
+    )
   }
 }
