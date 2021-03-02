@@ -24,16 +24,19 @@ Booster.configure('production', (config: BoosterConfig): void => {
         consumerConfig: [
           {
             topicName: 'account-created',
-            mappingOptions: {
-              entityTypeName: 'Account',
-              eventTypeName: 'AccountCreated',
-              topicEntityId: 'accountId',
-              fields: {
-                accountId: 'id',
-                clientId: 'customerId',
-                balance: 'currentBalance',
+            mappingOptions: [
+              {
+                entityTypeName: 'Account',
+                eventTypeName: 'AccountCreated',
+                topicEntityId: 'accountId',
+                fields: {
+                  accountId: 'id',
+                  clientId: 'customerId',
+                  balance: 'currentBalance',
+                },
               },
-            },
+              ... More events produced inside that topic
+            ],
           },
           {
             topicName: 'customer-created',
