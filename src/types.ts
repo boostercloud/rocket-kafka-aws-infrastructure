@@ -1,13 +1,15 @@
+export interface MappingOption {
+  entityTypeName: string
+  eventTypeName: string
+  fields: {
+    [key: string]: string
+  }
+  topicEntityId: string
+}
+
 export interface ConsumerTopicConfig {
   topicName: string
-  mappingOptions?: {
-    entityTypeName: string
-    eventTypeName: string
-    fields: {
-      [key: string]: string
-    }
-    topicEntityId: string
-  }
+  mappingOptions?: MappingOption[]
 }
 
 export interface ProducerTopicConfig {

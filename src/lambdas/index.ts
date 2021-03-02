@@ -5,7 +5,6 @@ import { DynamoDB, SecretsManager } from 'aws-sdk'
 const { Kafka } = require('kafkajs')
 import { ConsumerTopicConfig } from '../types'
 
-
 export const consumerHandler = async (event: any): Promise<void> => {
   for (const key in event.records) {
     const kafkaRecords = event.records[key]
@@ -23,24 +22,26 @@ async function saveEvent(topic: string, payload: any): Promise<void> {
   const ddb = new DynamoDB.DocumentClient()
   const consumerConfig: ConsumerTopicConfig[] = JSON.parse(process.env.CONSUMER_CONFIG!)
   const topicConfig = consumerConfig.find((item) => item.topicName === topic)
-  if (!topicConfig) {
+  if (!topicConfig || !payload.eventTypeName) {
     return
   }
 
+  const option = topicConfig.mappingOptions
+    ? topicConfig.mappingOptions.find((item) => item.eventTypeName === payload.eventTypeName)
+    : undefined
+
   const messageId = UUID.generate()
   const createdAt = new Date().toISOString()
-  const entityID = topicConfig.mappingOptions ? payload[topicConfig.mappingOptions.topicEntityId] : messageId
-  const typeName = topicConfig.mappingOptions ? topicConfig.mappingOptions.eventTypeName : 'KafkaMessageReceived'
-  const entityTypeName = topicConfig.mappingOptions ? topicConfig.mappingOptions.entityTypeName : 'KafkaMessage'
+  const entityID = option ? payload[option.topicEntityId] : messageId
+  const typeName = option ? option.eventTypeName : 'KafkaMessageReceived'
+  const entityTypeName = option ? option.entityTypeName : 'KafkaMessage'
   const valueForKafkaEvent = {
     messageId,
     payload,
     createdAt,
     topic,
   }
-  const value = topicConfig.mappingOptions
-    ? getValueMappings(topicConfig.mappingOptions.fields, payload)
-    : valueForKafkaEvent
+  const value = option ? getValueMappings(option.fields, payload) : valueForKafkaEvent
 
   const params = {
     TableName: process.env.EVENT_STORE_NAME!,
