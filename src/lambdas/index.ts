@@ -66,7 +66,9 @@ async function saveEvent(topic: string, payload: any): Promise<void> {
 
 function getKafkaPayload(fields: { [key: string]: string }, boosterEvent: any): string {
   if (!fields) {
-    return JSON.stringify(boosterEvent.value)
+    return JSON.stringify({ value: boosterEvent.value, eventTypeName: boosterEvent.typeName });
+    data['eventTypeName'] = boosterEvent.typeName
+    return JSON.stringify(data)
   } else {
     const outputData = {} as any
     Object.keys(fields).forEach((key) => {
@@ -103,21 +105,21 @@ export const publisherHandler = async (event: any): Promise<void> => {
   console.log(boosterEvent.value)
   console.log(currentTopicConfig)
 
-  if (currentTopicConfig.length != 0) {
-    const producer = kafka.producer()
-    await producer.connect()
-    await producer.send({
-      topic: currentTopicConfig.topicName,
-      messages: [{ value: getKafkaPayload(currentTopicConfig.fields, boosterEvent) }],
-    })
-    await producer.disconnect()
-  } else {
+  if (!currentTopicConfig) {
     console.log(
       `ignoring the event ${boosterEvent.typeName} because it is not of any of these types: ${topicConfig
         .map((element: any) => element.topic)
         .toString()}`
     )
+    return
   }
+  const producer = kafka.producer()
+  await producer.connect()
+  await producer.send({
+    topic: currentTopicConfig.topicName,
+    messages: [{ value: getKafkaPayload(currentTopicConfig.fields, boosterEvent) }],
+  })
+  await producer.disconnect()
 }
 
 const getValueMappings = (fields: { [key: string]: string }, payload: any): any => {
