@@ -68,9 +68,9 @@ function getKafkaPayload(fields: { [key: string]: string }, boosterEvent: any): 
   if (!fields) {
     return JSON.stringify({ value: boosterEvent.value, eventTypeName: boosterEvent.typeName })
   } else {
-    const outputData = {} as any
+    const outputData = { value: {} as any, eventTypeName: boosterEvent.typeName }
     Object.keys(fields).forEach((key) => {
-      outputData[fields[key]] = boosterEvent.value[key]
+      outputData.value[fields[key]] = boosterEvent.value[key]
     })
     return JSON.stringify(outputData)
   }
@@ -123,7 +123,7 @@ export const publisherHandler = async (event: any): Promise<void> => {
 const getValueMappings = (fields: { [key: string]: string }, payload: any): any => {
   const value = {} as any
   Object.keys(fields).forEach((key) => {
-    value[fields[key]] = payload[key]
+    value[fields[key]] = payload.value[key]
   })
   return value
 }
