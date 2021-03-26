@@ -66,9 +66,7 @@ async function saveEvent(topic: string, payload: any): Promise<void> {
 
 function getKafkaPayload(fields: { [key: string]: string }, boosterEvent: any): string {
   if (!fields) {
-    return JSON.stringify({ value: boosterEvent.value, eventTypeName: boosterEvent.typeName });
-    data['eventTypeName'] = boosterEvent.typeName
-    return JSON.stringify(data)
+    return JSON.stringify({ value: boosterEvent.value, eventTypeName: boosterEvent.typeName })
   } else {
     const outputData = {} as any
     Object.keys(fields).forEach((key) => {
