@@ -7,10 +7,12 @@
   "license": "ISC",
   "bundledDependencies": [
     "@boostercloud/framework-core",
+    "@boostercloud/framework-provider-aws",
     "kafkajs"
   ],
   "dependencies": {
-    "@boostercloud/framework-core": "0.11.5",
+    "@boostercloud/framework-core": "0.12.4",
+    "@boostercloud/framework-provider-aws": "0.12.4",
     "kafkajs": "^1.15.0"
   }
 }

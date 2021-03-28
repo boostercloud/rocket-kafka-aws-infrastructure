@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UUID } from '@boostercloud/framework-types'
+import { EventEnvelope, UUID } from '@boostercloud/framework-types'
 import { DynamoDB, SecretsManager } from 'aws-sdk'
 const { Kafka } = require('kafkajs')
 import { ConsumerTopicConfig } from '../types'
+import { eventsStoreAttributes } from '@boostercloud/framework-provider-aws/dist/constants'
+import {
+  partitionKeyForEvent,
+  encodeEventStoreSortingKey,
+  partitionKeyForIndexByEntity,
+} from '@boostercloud/framework-provider-aws/dist/library/keys-helper'
 
 export const consumerHandler = async (event: any): Promise<void> => {
   for (const key in event.records) {
@@ -32,7 +38,7 @@ async function saveEvent(topic: string, payload: any): Promise<void> {
 
   const messageId = UUID.generate()
   const createdAt = new Date().toISOString()
-  const entityID = option ? payload[option.topicEntityId] : messageId
+  const entityID = option ? payload.value[option.topicEntityId] : messageId
   const typeName = option ? option.eventTypeName : 'KafkaMessageReceived'
   const entityTypeName = option ? option.entityTypeName : 'KafkaMessage'
   const valueForKafkaEvent = {
@@ -43,18 +49,31 @@ async function saveEvent(topic: string, payload: any): Promise<void> {
   }
   const value = option ? getValueMappings(option.fields, payload) : valueForKafkaEvent
 
+  const eventEnvelope: EventEnvelope = {
+    createdAt,
+    kind: 'event',
+    requestID: UUID.generate(),
+    entityID,
+    entityTypeName,
+    typeName,
+    value,
+    version: 1,
+  }
+
   const params = {
     TableName: process.env.EVENT_STORE_NAME!,
     Item: {
-      createdAt,
-      kind: 'event',
-      requestID: UUID.generate(),
-      entityID,
-      entityTypeName,
-      entityTypeName_entityID_kind: `${entityTypeName}-${entityID}-event`,
-      typeName,
-      value,
-      version: 1,
+      ...eventEnvelope,
+      [eventsStoreAttributes.partitionKey]: partitionKeyForEvent(
+        eventEnvelope.entityTypeName,
+        eventEnvelope.entityID,
+        eventEnvelope.kind
+      ),
+      [eventsStoreAttributes.sortKey]: encodeEventStoreSortingKey(new Date().toISOString()),
+      [eventsStoreAttributes.indexByEntity.partitionKey]: partitionKeyForIndexByEntity(
+        eventEnvelope.entityTypeName,
+        eventEnvelope.kind
+      ),
     },
   }
   try {
@@ -99,9 +118,6 @@ export const publisherHandler = async (event: any): Promise<void> => {
   const record = event.Records[0]
   const boosterEvent = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
   const currentTopicConfig = topicConfig.find((element: any) => element.eventTypeName === boosterEvent.typeName)
-
-  console.log(boosterEvent.value)
-  console.log(currentTopicConfig)
 
   if (!currentTopicConfig) {
     console.log(

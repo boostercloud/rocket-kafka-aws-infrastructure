@@ -114,3 +114,6 @@ node_modules
 coverage
 .DS_Store
 .docs
+
+package-lock.json
+src/lambdas/package-lock.json
