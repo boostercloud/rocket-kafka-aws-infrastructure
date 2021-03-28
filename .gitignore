@@ -116,4 +116,4 @@ coverage
 .docs
 
 package-lock.json
-src/lambdas/package-lock.json
+./src/lambdas/package-lock.json
