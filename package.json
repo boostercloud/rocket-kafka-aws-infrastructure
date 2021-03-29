@@ -45,9 +45,9 @@
     "@aws-cdk/core": "1.67.0"
   },
   "devDependencies": {
-    "@boostercloud/framework-core": "0.12.4",
-    "@boostercloud/framework-provider-aws-infrastructure": "0.12.4",
-    "@boostercloud/framework-types": "0.12.4",
+    "@boostercloud/framework-core": "0.14.0",
+    "@boostercloud/framework-provider-aws-infrastructure": "0.14.0",
+    "@boostercloud/framework-types": "0.14.0",
     "@types/chai": "^4.2.14",
     "@types/chai-as-promised": "^7.1.2",
     "@types/mocha": "^8.2.0",
