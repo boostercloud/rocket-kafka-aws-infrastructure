@@ -5,11 +5,6 @@ import { DynamoDB, SecretsManager } from 'aws-sdk'
 const { Kafka } = require('kafkajs')
 import { ConsumerTopicConfig } from '../types'
 import { eventsStoreAttributes } from '@boostercloud/framework-provider-aws/dist/constants'
-import {
-  partitionKeyForEvent,
-  encodeEventStoreSortingKey,
-  partitionKeyForIndexByEntity,
-} from '@boostercloud/framework-provider-aws/dist/library/keys-helper'
 
 export const consumerHandler = async (event: any): Promise<void> => {
   for (const key in event.records) {
@@ -60,16 +55,19 @@ async function saveEvent(topic: string, payload: any): Promise<void> {
     version: 1,
   }
 
+  const partitionKey = partitionKeyForEvent(eventEnvelope.entityTypeName, eventEnvelope.entityID, eventEnvelope.kind)
+  const sortKey = createdAt
   const params = {
     TableName: process.env.EVENT_STORE_NAME!,
+    ConditionExpression: `${eventsStoreAttributes.partitionKey} <> :partitionKey AND ${eventsStoreAttributes.sortKey} <> :sortKey`,
+    ExpressionAttributeValues: {
+      ':partitionKey': partitionKey,
+      ':sortKey': sortKey,
+    },
     Item: {
       ...eventEnvelope,
-      [eventsStoreAttributes.partitionKey]: partitionKeyForEvent(
-        eventEnvelope.entityTypeName,
-        eventEnvelope.entityID,
-        eventEnvelope.kind
-      ),
-      [eventsStoreAttributes.sortKey]: encodeEventStoreSortingKey(new Date().toISOString()),
+      [eventsStoreAttributes.partitionKey]: partitionKey,
+      [eventsStoreAttributes.sortKey]: sortKey,
       [eventsStoreAttributes.indexByEntity.partitionKey]: partitionKeyForIndexByEntity(
         eventEnvelope.entityTypeName,
         eventEnvelope.kind
@@ -143,3 +141,11 @@ const getValueMappings = (fields: { [key: string]: string }, payload: any): any 
   })
   return value
 }
+function partitionKeyForEvent(entityTypeName: string, entityID: UUID, kind: string) {
+  throw new Error('Function not implemented.')
+}
+
+function partitionKeyForIndexByEntity(entityTypeName: string, kind: string) {
+  throw new Error('Function not implemented.')
+}
+
