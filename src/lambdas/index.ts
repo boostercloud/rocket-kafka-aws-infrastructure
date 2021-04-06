@@ -5,6 +5,10 @@ import { DynamoDB, SecretsManager } from 'aws-sdk'
 const { Kafka } = require('kafkajs')
 import { ConsumerTopicConfig } from '../types'
 import { eventsStoreAttributes } from '@boostercloud/framework-provider-aws/dist/constants'
+import {
+  partitionKeyForEvent,
+  partitionKeyForIndexByEntity,
+} from '@boostercloud/framework-provider-aws/dist/library/keys-helper'
 
 export const consumerHandler = async (event: any): Promise<void> => {
   for (const key in event.records) {
@@ -141,11 +145,3 @@ const getValueMappings = (fields: { [key: string]: string }, payload: any): any 
   })
   return value
 }
-function partitionKeyForEvent(entityTypeName: string, entityID: UUID, kind: string) {
-  throw new Error('Function not implemented.')
-}
-
-function partitionKeyForIndexByEntity(entityTypeName: string, kind: string) {
-  throw new Error('Function not implemented.')
-}
-
