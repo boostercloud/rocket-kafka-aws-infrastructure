@@ -59,7 +59,7 @@ export class KafkaConsumerStack {
     }
 
     params.consumerConfig.forEach((config) => {
-      const resourceName = 'kfkes' + config.topicName.replace('-', '')
+      const resourceName = 'kfkes' + config.topicName.replace(/-/g, '')
       new CfnInclude(stack, resourceName, {
         template: {
           Resources: {
