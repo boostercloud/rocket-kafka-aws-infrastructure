@@ -1,6 +1,6 @@
 {
   "name": "@boostercloud/rocket-kakfa-connector-aws-infrastructure",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Booster rocket to integrate a self managed Kafka cluster with your Booster Application",
   "main": "dist/index.js",
   "files": [
@@ -45,9 +45,9 @@
     "@aws-cdk/core": "1.67.0"
   },
   "devDependencies": {
-    "@boostercloud/framework-core": "0.14.3",
-    "@boostercloud/framework-provider-aws-infrastructure": "0.14.3",
-    "@boostercloud/framework-types": "0.14.3",
+    "@boostercloud/framework-core": "0.14.4",
+    "@boostercloud/framework-provider-aws-infrastructure": "0.14.4",
+    "@boostercloud/framework-types": "0.14.4",
     "@types/chai": "^4.2.14",
     "@types/chai-as-promised": "^7.1.2",
     "@types/mocha": "^8.2.0",
