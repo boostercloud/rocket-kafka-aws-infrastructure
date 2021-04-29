@@ -18,7 +18,7 @@ export class KafkaProducerStack {
       handler: 'index.publisherHandler',
       functionName: config.appName + '-kafka-producer',
       code: Code.fromAsset(path.join(__dirname, 'lambdas')),
-      events: [new DynamoEventSource(eventStore, { startingPosition: StartingPosition.LATEST, batchSize: 1 })],
+      events: [new DynamoEventSource(eventStore, { startingPosition: StartingPosition.TRIM_HORIZON, batchSize: 1000 })],
       environment: {
         KAFKA_NODES: params.bootstrapServers.toString(),
         KAFKA_TOPICS_CONFIG: JSON.stringify(params.producerConfig),
