@@ -1,6 +1,6 @@
 {
   "name": "@boostercloud/rocket-kafka-aws-infrastructure",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Booster rocket to integrate a self managed Kafka cluster with your Booster Application",
   "main": "dist/index.js",
   "files": [
@@ -34,20 +34,20 @@
     "access": "restricted"
   },
   "dependencies": {
-    "@aws-cdk/aws-dynamodb": "1.67.0",
-    "@aws-cdk/aws-ec2": "1.67.0",
-    "@aws-cdk/aws-events": "1.67.0",
-    "@aws-cdk/aws-iam": "1.67.0",
-    "@aws-cdk/aws-lambda": "1.67.0",
-    "@aws-cdk/aws-lambda-event-sources": "1.67.0",
-    "@aws-cdk/aws-secretsmanager": "1.67.0",
-    "@aws-cdk/cloudformation-include": "1.67.0",
-    "@aws-cdk/core": "1.67.0"
+    "@aws-cdk/aws-dynamodb": "1.91.0",
+    "@aws-cdk/aws-ec2": "1.91.0",
+    "@aws-cdk/aws-events": "1.91.0",
+    "@aws-cdk/aws-iam": "1.91.0",
+    "@aws-cdk/aws-lambda": "1.91.0",
+    "@aws-cdk/aws-lambda-event-sources": "1.91.0",
+    "@aws-cdk/aws-secretsmanager": "1.91.0",
+    "@aws-cdk/cloudformation-include": "1.91.0",
+    "@aws-cdk/core": "1.91.0"
   },
   "devDependencies": {
-    "@boostercloud/framework-core": "0.15.1",
-    "@boostercloud/framework-provider-aws-infrastructure": "0.15.1",
-    "@boostercloud/framework-types": "0.15.1",
+    "@boostercloud/framework-core": "0.16.2",
+    "@boostercloud/framework-provider-aws-infrastructure": "0.16.2",
+    "@boostercloud/framework-types": "0.16.2",
     "@types/chai": "^4.2.14",
     "@types/chai-as-promised": "^7.1.2",
     "@types/mocha": "^8.2.0",
@@ -64,6 +64,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.1.2",
     "faker": "5.1.0",
+    "metadata-booster": "0.3.1",
     "mocha": "^8.2.1",
     "nyc": "^15.0.1",
     "prettier": "^1.19.1",

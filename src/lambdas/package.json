@@ -11,8 +11,8 @@
     "kafkajs"
   ],
   "dependencies": {
-    "@boostercloud/framework-core": "0.15.1",
-    "@boostercloud/framework-provider-aws": "0.15.1",
+    "@boostercloud/framework-core": "0.16.2",
+    "@boostercloud/framework-provider-aws": "0.16.2",
     "kafkajs": "^1.15.0"
   }
 }
