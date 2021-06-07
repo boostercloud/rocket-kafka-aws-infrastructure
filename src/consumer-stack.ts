@@ -11,7 +11,7 @@ export class KafkaConsumerStack {
     const eventsStore = stack.node.tryFindChild('events-store') as Table
 
     const kafkaTriggerFunction = new Function(stack, 'kafkaConsumer', {
-      runtime: Runtime.NODEJS_12_X,
+      runtime: Runtime.NODEJS_14_X,
       timeout: Duration.minutes(15),
       memorySize: 1024,
       handler: 'index.consumerHandler',
