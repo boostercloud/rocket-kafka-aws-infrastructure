@@ -13,6 +13,8 @@
   "dependencies": {
     "@boostercloud/framework-core": "0.16.2",
     "@boostercloud/framework-provider-aws": "0.16.2",
+    "@types/aws-lambda": "8.10.48",
+    "aws-sdk": "2.764.0",
     "kafkajs": "^1.15.0"
   }
 }

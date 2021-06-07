@@ -117,24 +117,26 @@ export const publisherHandler = async (event: any): Promise<void> => {
     },
   })
 
-  const record = event.Records[0]
-  const boosterEvent = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
-  const currentTopicConfig = topicConfig.find((element: any) => element.eventTypeName === boosterEvent.typeName)
-
-  if (!currentTopicConfig) {
-    console.log(
-      `ignoring the event ${boosterEvent.typeName} because it is not of any of these types: ${topicConfig
-        .map((element: any) => element.topic)
-        .toString()}`
-    )
-    return
-  }
   const producer = kafka.producer()
   await producer.connect()
-  await producer.send({
-    topic: currentTopicConfig.topicName,
-    messages: [{ value: getKafkaPayload(currentTopicConfig.fields, boosterEvent) }],
-  })
+  for (const record of event.Records) {
+    const boosterEvent = DynamoDB.Converter.unmarshall(record!.dynamodb!.NewImage)
+    const currentTopicConfig = topicConfig.find((element: any) => element.eventTypeName === boosterEvent.typeName)
+
+    if (!currentTopicConfig) {
+      console.log(
+        `ignoring the event ${boosterEvent.typeName} because it is not of any of these types: ${topicConfig
+          .map((element: any) => element.topic)
+          .toString()}`
+      )
+    } else {
+      console.log(`sending event ${boosterEvent} to topic ${currentTopicConfig.topicName}`)
+      await producer.send({
+        topic: currentTopicConfig.topicName,
+        messages: [{ value: getKafkaPayload(currentTopicConfig.fields, boosterEvent) }],
+      })
+    }
+  }
   await producer.disconnect()
 }
 
