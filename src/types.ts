@@ -19,8 +19,8 @@ export interface ProducerTopicConfig {
 }
 
 export interface KafkaRocketParams {
-  consumerConfig: ConsumerTopicConfig[]
-  producerConfig: ProducerTopicConfig[]
+  consumerConfig?: ConsumerTopicConfig[]
+  producerConfig?: ProducerTopicConfig[]
   bootstrapServers: string[]
   secretArn: string
 }
