@@ -147,6 +147,7 @@ const getValueMappings = (fields: { [key: string]: string }, payload: any, autoG
     if (fields[key].includes(':')) {
       const valueKeys = fields[key].split(':')
       value[valueKeys[0]] = {
+        ...value[valueKeys[0]],
         [valueKeys[1]]: payload.value[key],
       }
     } else {
